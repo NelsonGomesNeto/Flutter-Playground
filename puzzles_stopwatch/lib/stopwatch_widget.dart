@@ -1,22 +1,46 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:puzzles_stopwatch/page.dart';
 
-class StopwatchWidget extends StatefulWidget {
+class StopwatchWidget extends Page {
+  int _selectedPuzzle;
+  int rebuildCounter = 0;
+  final String _pageText;
+  _StopwatchWidgetState _stopwatchWidgetState;
+  StopwatchWidget(this._selectedPuzzle, this._pageText, {Key key}) : super(key: key);
+
   @override
-  _StopwatchWidgetState createState() => _StopwatchWidgetState();
+  _StopwatchWidgetState createState() {
+    return _stopwatchWidgetState = _StopwatchWidgetState(_selectedPuzzle, _pageText, rebuildCounter++);
+  }
+
+  @override
+  void setPuzzle(int selectedPuzzle, bool refresh) {
+    if (refresh)
+      _stopwatchWidgetState.setPuzzle(_selectedPuzzle = selectedPuzzle);
+    else
+      _selectedPuzzle = selectedPuzzle;
+  }
 }
   
 class _StopwatchWidgetState extends State<StopwatchWidget> {
+  int _selectedPuzzle;
+  int _rebuildCounter;
+  final String _pageText;
   Stopwatch _stopwatch = Stopwatch();
+  _StopwatchWidgetState(this._selectedPuzzle, this._pageText, this._rebuildCounter);
+
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          _StopwatchText(stopwatch: _stopwatch),
+          Text("rebuilt: " + _rebuildCounter.toString(), style: TextStyle(fontSize: 64),),
+          Text("page: " + _pageText, style: TextStyle(fontSize: 64),),
+          Text("puzzle: " + _selectedPuzzle.toString(), style: TextStyle(fontSize: 64),),
+          StopwatchText(stopwatch: _stopwatch),
           ButtonBar(
             alignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -45,18 +69,24 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
       ),
     );
   }
+
+  void setPuzzle(int selectedPuzzle) {
+    setState(() {
+      this._selectedPuzzle = selectedPuzzle;
+    });
+  }
 }
 
-class _StopwatchText extends StatefulWidget {
+class StopwatchText extends StatefulWidget {
   final Stopwatch stopwatch;
   
-  _StopwatchText({this.stopwatch});
+  StopwatchText({this.stopwatch});
 
   @override
   _StopwatchTextState createState() => _StopwatchTextState(stopwatch: stopwatch);
 }
   
-class _StopwatchTextState extends State<_StopwatchText> {
+class _StopwatchTextState extends State<StopwatchText> {
   Timer timer;
   final Stopwatch stopwatch;
 
